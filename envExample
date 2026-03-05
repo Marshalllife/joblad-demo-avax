@@ -1,0 +1,24 @@
+# MongoDB
+MONGODB_URI=
+
+# Session (generate: openssl rand -hex 32)
+SESSION_SECRET=
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Anthropic — copy from /Users/marshall/Documents/Paddyzone/.env.local
+ANTHROPIC_API_KEY=
+
+# Avalanche Fuji
+FUJI_RPC_URL=https://api.avax-test.network/ext/bc/C/rpc
+ADMIN_WALLET_PRIVATE_KEY=
+WALLET_ENCRYPTION_KEY=
+
+# Smart Contract Addresses — filled after Phase 2 deploy
+ESCROW_CONTRACT_ADDRESS=
+REPUTATION_CONTRACT_ADDRESS=
+CREDENTIALS_CONTRACT_ADDRESS=
+
+# Admin Panel
+ADMIN_SECRET=
