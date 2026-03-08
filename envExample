@@ -7,7 +7,7 @@ SESSION_SECRET=
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Anthropic — copy from /Users/marshall/Documents/Paddyzone/.env.local
+# Anthropic
 ANTHROPIC_API_KEY=
 
 # Avalanche Fuji
@@ -15,7 +15,7 @@ FUJI_RPC_URL=https://api.avax-test.network/ext/bc/C/rpc
 ADMIN_WALLET_PRIVATE_KEY=
 WALLET_ENCRYPTION_KEY=
 
-# Smart Contract Addresses — filled after Phase 2 deploy
+# Smart Contract Addresses
 ESCROW_CONTRACT_ADDRESS=
 REPUTATION_CONTRACT_ADDRESS=
 CREDENTIALS_CONTRACT_ADDRESS=
