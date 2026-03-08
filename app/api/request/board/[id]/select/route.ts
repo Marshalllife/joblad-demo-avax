@@ -66,7 +66,8 @@ export async function POST(
     app.status = app.providerId.toString() === application.providerId.toString() ? 'selected' : 'rejected'
   }
 
-  const seekerCoords = request.location?.coordinates || [3.3792, 6.5244]
+  const coords = request.location?.coordinates
+  const seekerCoords = coords && coords.length >= 2 ? coords : [3.3792, 6.5244]
   const providerStart = [
     seekerCoords[0] + (Math.random() - 0.5) * 0.1,
     seekerCoords[1] + (Math.random() - 0.5) * 0.1,

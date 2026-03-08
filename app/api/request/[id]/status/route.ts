@@ -22,7 +22,8 @@ export async function GET(
     return new Response('Request not found', { status: 404 })
   }
 
-  const seekerCoords = request.location?.coordinates || [3.3792, 6.5244]
+  const coords = request.location?.coordinates
+  const seekerCoords = coords && coords.length >= 2 ? coords : [3.3792, 6.5244]
 
   const encoder = new TextEncoder()
 

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { getAdminWallet, toWei, toJobId, snowtraceUrl } from '@/utils/avalanche'
+import { getAdminWallet, getProvider, toWei, toJobId, snowtraceUrl } from '@/utils/avalanche'
 import { getUserSigner, getEscrowContract, getReputationContract, getCredentialsContract } from './AvalancheService'
 import type { IUser } from '@/models/User'
 
@@ -27,7 +27,8 @@ export interface MintCredentialResult {
 
 /**
  * Seeker creates on-chain escrow when booking a provider.
- * AVAX amount is locked in the JobladEscrow contract.
+ * If escrow already exists on-chain (e.g. from a previous failed attempt),
+ * recovers the original tx hash from event logs rather than failing.
  */
 export async function createEscrow(
   seekerUser: IUser,
@@ -39,15 +40,34 @@ export async function createEscrow(
   const contract = getEscrowContract(seeker)
   const contractJobId = toJobId(mongoRequestId)
 
-  const tx = await contract.createEscrow(contractJobId, providerWalletAddress, {
-    value: toWei(avaxAmount),
-  })
-  const receipt = await tx.wait()
+  try {
+    const tx = await contract.createEscrow(contractJobId, providerWalletAddress, {
+      value: toWei(avaxAmount),
+    })
+    const receipt = await tx.wait()
+    return {
+      txHash: receipt.hash,
+      contractJobId,
+      snowtraceLink: snowtraceUrl(receipt.hash),
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (!msg.includes('Escrow already exists')) throw err
 
-  return {
-    txHash: receipt.hash,
-    contractJobId,
-    snowtraceLink: snowtraceUrl(receipt.hash),
+    // Escrow already on-chain — find original tx from EscrowCreated event logs
+    // Fuji RPC limits eth_getLogs to 2048 blocks, so search only recent blocks
+    const readContract = getEscrowContract()
+    const latestBlock = await getProvider().getBlockNumber()
+    const fromBlock = Math.max(0, latestBlock - 2000)
+    const filter = readContract.filters.EscrowCreated(contractJobId)
+    const events = await readContract.queryFilter(filter, fromBlock, latestBlock)
+    const txHash = events[0]?.transactionHash || ''
+
+    return {
+      txHash,
+      contractJobId,
+      snowtraceLink: txHash ? snowtraceUrl(txHash) : '',
+    }
   }
 }
 
